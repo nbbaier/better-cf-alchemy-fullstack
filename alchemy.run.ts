@@ -68,16 +68,6 @@ export const server = await Worker("server", {
 		CORS_ORIGIN: alchemy.env.CORS_ORIGIN,
 		BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL,
 		BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET,
-		RESEND_API_KEY: alchemy.secret.env.RESEND_API_KEY,
-		GOOGLE_CLIENT_ID: alchemy.secret.env.GOOGLE_CLIENT_ID,
-		GOOGLE_CLIENT_SECRET: alchemy.secret.env.GOOGLE_CLIENT_SECRET,
-		GITHUB_CLIENT_ID: alchemy.secret.env.GITHUB_CLIENT_ID,
-		GITHUB_CLIENT_SECRET: alchemy.secret.env.GITHUB_CLIENT_SECRET,
-		API_ENCRYPTION_KEY: alchemy.secret.env.API_ENCRYPTION_KEY,
-		OPENAI_API_KEY: alchemy.secret.env.OPENAI_API_KEY,
-		GOOGLE_GENERATIVE_AI_API_KEY:
-			alchemy.secret.env.GOOGLE_GENERATIVE_AI_API_KEY,
-		OPENROUTER_API_KEY: alchemy.secret.env.OPENROUTER_API_KEY,
 	},
 	routes: [alchemy.env.API_ROUTE_PATTERN],
 	dev: {

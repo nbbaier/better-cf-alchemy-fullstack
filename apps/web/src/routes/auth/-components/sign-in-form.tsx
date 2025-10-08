@@ -12,9 +12,8 @@ import {
 } from "@/web/components/ui/input-otp";
 import { useAppForm } from "@/web/components/ui/tanstack-form";
 import { authClient } from "@/web/lib/auth-client";
-import { SIGN_IN_FORM, SOCIAL_PROVIDERS } from "@/web/lib/constants";
+import { SIGN_IN_FORM } from "@/web/lib/constants";
 import { signInEmailSchema, signInOtpSchema } from "@/web/lib/validators";
-import { GitHubIcon, GoogleIcon } from "./social-sign-in-icons";
 
 interface SignInFormProps {
 	redirectPath: string;
@@ -63,35 +62,6 @@ export function SignInForm({ redirectPath }: SignInFormProps) {
 		},
 	});
 
-	const socialSignInMutation = useMutation({
-		mutationFn: async ({
-			provider,
-		}: {
-			provider: keyof typeof SOCIAL_PROVIDERS;
-		}) => {
-			const baseUrl =
-				import.meta.env.VITE_WEB_URL ??
-				(typeof window !== "undefined" ? window.location.origin : "");
-			const callbackURL = `${baseUrl}${redirectPath}`;
-
-			return authClient.signIn.social({
-				provider: SOCIAL_PROVIDERS[provider],
-				callbackURL,
-			});
-		},
-		onSuccess: (_, variables) => {
-			toast.success(
-				`Successfully signed in with ${SOCIAL_PROVIDERS[variables.provider]}`,
-			);
-		},
-		onError: (error: { error?: { message?: string } }, variables) => {
-			toast.error(
-				error.error?.message ||
-					`Failed to sign in with ${SOCIAL_PROVIDERS[variables.provider]}`,
-			);
-		},
-	});
-
 	const emailForm = useAppForm({
 		defaultValues: {
 			email: "",
@@ -117,14 +87,6 @@ export function SignInForm({ redirectPath }: SignInFormProps) {
 		},
 	});
 
-	const handleGoogleLogin = () => {
-		socialSignInMutation.mutate({ provider: "GOOGLE" });
-	};
-
-	const handleGithubLogin = () => {
-		socialSignInMutation.mutate({ provider: "GITHUB" });
-	};
-
 	if (verifyOtpMutation.isError) {
 		otpForm.setFieldValue("otp", "");
 		verifyOtpMutation.reset();
@@ -138,86 +100,53 @@ export function SignInForm({ redirectPath }: SignInFormProps) {
 			</p>
 
 			{!isOtpSent && (
-				<>
-					<emailForm.AppForm>
-						<form
-							onSubmit={(e) => {
-								e.preventDefault();
-								e.stopPropagation();
-								void emailForm.handleSubmit();
-							}}
-							className="space-y-4"
-						>
-							<emailForm.AppField name="email">
-								{(field) => (
-									<field.FormItem>
-										<field.FormLabel>Email</field.FormLabel>
-										<field.FormControl>
-											<Input
-												type="email"
-												value={field.state.value}
-												onChange={(e) => field.handleChange(e.target.value)}
-												onBlur={field.handleBlur}
-												disabled={sendOtpMutation.isPending}
-												placeholder="you@example.com"
-											/>
-										</field.FormControl>
-										<field.FormMessage />
-									</field.FormItem>
-								)}
-							</emailForm.AppField>
+				<emailForm.AppForm>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							void emailForm.handleSubmit();
+						}}
+						className="space-y-4"
+					>
+						<emailForm.AppField name="email">
+							{(field) => (
+								<field.FormItem>
+									<field.FormLabel>Email</field.FormLabel>
+									<field.FormControl>
+										<Input
+											type="email"
+											value={field.state.value}
+											onChange={(e) => field.handleChange(e.target.value)}
+											onBlur={field.handleBlur}
+											disabled={sendOtpMutation.isPending}
+											placeholder="you@example.com"
+										/>
+									</field.FormControl>
+									<field.FormMessage />
+								</field.FormItem>
+							)}
+						</emailForm.AppField>
 
-							<emailForm.Subscribe>
-								{(state) => (
-									<Button
-										type="submit"
-										className="w-full text-base"
-										disabled={
-											!state.canSubmit ||
-											state.isSubmitting ||
-											sendOtpMutation.isPending
-										}
-									>
-										{sendOtpMutation.isPending
-											? SIGN_IN_FORM.LOADING_MESSAGES.SENDING_OTP
-											: "Send verification code"}
-									</Button>
-								)}
-							</emailForm.Subscribe>
-						</form>
-					</emailForm.AppForm>
-
-					<div className="relative my-6">
-						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-gray-300 border-t dark:border-gray-600" />
-						</div>
-						<div className="relative flex justify-center text-sm">
-							<span className="bg-background px-2 text-gray-500 dark:text-gray-400">
-								OR
-							</span>
-						</div>
-					</div>
-
-					<div className="space-y-4">
-						<Button
-							className="relative flex w-full items-center justify-center space-x-2 border border-gray-300 bg-background text-base text-foreground hover:bg-accent dark:border-gray-600"
-							onClick={handleGoogleLogin}
-							disabled={socialSignInMutation.isPending}
-						>
-							<GoogleIcon className="size-4" />
-							<span>Sign in with Google</span>
-						</Button>
-
-						<Button
-							className="relative flex w-full items-center justify-center space-x-2 border border-gray-300 bg-background text-base text-foreground hover:bg-accent dark:border-gray-600"
-							onClick={handleGithubLogin}
-							disabled={socialSignInMutation.isPending}
-						>
-							<GitHubIcon className="size-4" />
-							<span>Sign in with GitHub</span>
-						</Button>
-					</div>
-				</>
+						<emailForm.Subscribe>
+							{(state) => (
+								<Button
+									type="submit"
+									className="w-full text-base"
+									disabled={
+										!state.canSubmit ||
+										state.isSubmitting ||
+										sendOtpMutation.isPending
+									}
+								>
+									{sendOtpMutation.isPending
+										? SIGN_IN_FORM.LOADING_MESSAGES.SENDING_OTP
+										: "Send verification code"}
+								</Button>
+							)}
+						</emailForm.Subscribe>
+					</form>
+				</emailForm.AppForm>
 			)}
 
 			{isOtpSent && (
