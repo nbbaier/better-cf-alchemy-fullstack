@@ -1,6 +1,6 @@
 # Cloudflare Alchemy Full-Stack Template
 
-A production-ready full-stack template built on Cloudflare infrastructure with dual-database architecture, authentication, and modern development tools.
+A full-stack template built on Cloudflare infrastructure with dual-database architecture, authentication, and modern development tools.
 
 Adapted from [oscabriel/better-chat](https://github.com/oscabriel/better-chat).  
 
