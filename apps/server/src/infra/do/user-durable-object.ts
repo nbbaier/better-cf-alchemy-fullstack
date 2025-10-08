@@ -1,13 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
-import { safeValidateUIMessages } from "ai";
-import { and, asc, desc, eq, lt } from "drizzle-orm";
+import { desc, eq, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/durable-sqlite";
 import { migrate } from "drizzle-orm/durable-sqlite/migrator";
-import {
-	type AppUIMessage,
-	appMessageMetadataSchema,
-} from "@/server/domain/ui-messages";
-import { normalizeMessage } from "@/server/services/ai/message-service";
+import type { Item, ItemListResult } from "@/server/domain/items";
 // @ts-expect-error - generated JS file has no types
 import migrations from "./migrations/migrations.js";
 import * as schema from "./schema/chat";
@@ -44,44 +39,17 @@ export class UserDurableObject extends DurableObject<Env> {
 		return { status: "ok" } as const;
 	}
 
-	async listConversations(): Promise<
-		Array<{
-			id: string;
-			title: string | null;
-			created: Date;
-			updated: Date;
-		}>
-	> {
-		return await this.db
-			.select()
-			.from(schema.conversations)
-			.orderBy(desc(schema.conversations.updated))
-			.all();
-	}
-
-	async getConversation(conversationId: string) {
-		const row = await this.db
-			.select()
-			.from(schema.conversations)
-			.where(eq(schema.conversations.id, conversationId))
-			.get();
-		return row ?? null;
-	}
-
-	async listMessages(conversationId: string, limit = 100, cursor?: number) {
+	async listItems(limit = 100, cursor?: number): Promise<ItemListResult> {
 		const cappedLimit = Math.min(limit, 200);
 		const condition = cursor
-			? and(
-					eq(schema.messages.conversationId, conversationId),
-					lt(schema.messages.created, new Date(cursor)),
-				)
-			: eq(schema.messages.conversationId, conversationId);
+			? lt(schema.items.created, new Date(cursor))
+			: undefined;
 
 		const rows = await this.db
 			.select()
-			.from(schema.messages)
+			.from(schema.items)
 			.where(condition)
-			.orderBy(asc(schema.messages.created))
+			.orderBy(desc(schema.items.created))
 			.limit(cappedLimit);
 
 		const nextCursor =
@@ -91,163 +59,58 @@ export class UserDurableObject extends DurableObject<Env> {
 					: Number(rows[rows.length - 1]?.created) || null
 				: null;
 
-		const items: AppUIMessage[] = [];
-
-		for (const row of rows) {
-			const parsed = parseStoredMessage(row);
-			const validation = await safeValidateUIMessages({
-				messages: [parsed],
-				metadataSchema: appMessageMetadataSchema.optional(),
-			});
-
-			if (validation.success) {
-				items.push(normalizeMessage(validation.data[0]));
-			} else {
-				console.error("Failed to validate stored UIMessage", {
-					conversationId,
-					messageId: row.id,
-					error: validation.error,
-				});
-				items.push(createFallbackMessage(row));
-			}
-		}
-
 		return {
-			items,
+			items: rows,
 			nextCursor,
 		};
 	}
 
-	async upsertConversation(conversationId: string, title?: string | null) {
+	async getItem(itemId: string): Promise<Item | null> {
+		const row = await this.db
+			.select()
+			.from(schema.items)
+			.where(eq(schema.items.id, itemId))
+			.get();
+		return row ?? null;
+	}
+
+	async createItem(
+		itemId: string,
+		title: string,
+		content: string,
+	): Promise<Item> {
+		const now = new Date();
+		const item = {
+			id: itemId,
+			title,
+			content,
+			created: now,
+			updated: now,
+		};
+		await this.db.insert(schema.items).values(item);
+		return item;
+	}
+
+	async updateItem(
+		itemId: string,
+		title: string,
+		content: string,
+	): Promise<Item> {
 		const now = new Date();
 		await this.db
-			.insert(schema.conversations)
-			.values({ id: conversationId, title, created: now, updated: now })
-			.onConflictDoUpdate({
-				target: schema.conversations.id,
-				set: { title, updated: now },
-			});
-		return { id: conversationId, title: title ?? null };
-	}
+			.update(schema.items)
+			.set({ title, content, updated: now })
+			.where(eq(schema.items.id, itemId));
 
-	async appendMessages(conversationId: string, items: AppUIMessage[]) {
-		if (!items.length) {
-			return { count: 0 };
+		const updated = await this.getItem(itemId);
+		if (!updated) {
+			throw new Error("Item not found after update");
 		}
-
-		const maxBatchSize = 100;
-		if (items.length > maxBatchSize) {
-			throw new Error(`message batch too large (>${maxBatchSize})`);
-		}
-
-		await this.upsertConversation(conversationId);
-
-		const normalizedItems = items.map((message) => normalizeMessage(message));
-
-		const values = normalizedItems.map((message) => {
-			const createdAt =
-				typeof message.metadata?.createdAt === "number"
-					? message.metadata.createdAt
-					: Date.now();
-
-			return {
-				id: message.id,
-				conversationId,
-				role: message.role,
-				message: JSON.stringify(message),
-				created: new Date(createdAt),
-			};
-		});
-
-		await this.db
-			.insert(schema.messages)
-			.values(values)
-			.onConflictDoNothing({ target: schema.messages.id });
-
-		const latestCreated = values.reduce(
-			(max, row) => (row.created > max ? row.created : max),
-			values[0]?.created,
-		);
-		await this.db
-			.update(schema.conversations)
-			.set({ updated: latestCreated })
-			.where(eq(schema.conversations.id, conversationId));
-		return { count: values.length };
+		return updated;
 	}
 
-	async deleteConversation(conversationId: string) {
-		await this.db
-			.delete(schema.messages)
-			.where(eq(schema.messages.conversationId, conversationId));
-		await this.db
-			.delete(schema.conversations)
-			.where(eq(schema.conversations.id, conversationId));
-		return { id: conversationId };
+	async deleteItem(itemId: string): Promise<{ id: string }> {
+		await this.db.delete(schema.items).where(eq(schema.items.id, itemId));
+		return { id: itemId };
 	}
-}
-
-function parseStoredMessage(row: {
-	id: string;
-	message: string;
-	role: unknown;
-	created: unknown;
-}) {
-	try {
-		return JSON.parse(row.message) as unknown;
-	} catch (error) {
-		console.error("Failed to parse stored message JSON", {
-			messageId: row.id,
-			error,
-		});
-		return {
-			id: row.id,
-			role: coerceRole(row.role),
-			parts: [
-				{
-					type: "text",
-					text: "Message unavailable",
-				},
-			],
-			metadata: {
-				createdAt: extractCreatedTimestamp(row.created),
-			},
-		};
-	}
-}
-
-function createFallbackMessage(row: {
-	id: string;
-	role: unknown;
-	created: unknown;
-}) {
-	return normalizeMessage({
-		id: row.id,
-		role: coerceRole(row.role),
-		parts: [
-			{
-				type: "text",
-				text: "Message unavailable",
-			},
-		],
-		metadata: {
-			createdAt: extractCreatedTimestamp(row.created),
-		},
-	});
-}
-
-function coerceRole(value: unknown): AppUIMessage["role"] {
-	if (value === "assistant" || value === "system") {
-		return value;
-	}
-	return "user";
-}
-
-function extractCreatedTimestamp(value: unknown): number {
-	if (value instanceof Date) {
-		return value.getTime();
-	}
-	if (typeof value === "number" && Number.isFinite(value)) {
-		return value;
-	}
-	return Date.now();
 }

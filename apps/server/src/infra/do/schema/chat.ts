@@ -1,8 +1,9 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const conversations = sqliteTable("conversations", {
+export const items = sqliteTable("items", {
 	id: text("id").primaryKey(),
-	title: text("title"),
+	title: text("title").notNull(),
+	content: text("content").notNull(),
 	created: integer("created", { mode: "timestamp_ms" })
 		.$defaultFn(() => new Date())
 		.notNull(),
@@ -11,19 +12,3 @@ export const conversations = sqliteTable("conversations", {
 		.$onUpdateFn(() => new Date())
 		.notNull(),
 });
-
-export const messages = sqliteTable(
-	"messages",
-	{
-		id: text("id").primaryKey(),
-		conversationId: text("conversation_id").notNull(),
-		message: text("message").notNull(),
-		role: text("role").notNull(),
-		created: integer("created", { mode: "timestamp_ms" })
-			.$defaultFn(() => new Date())
-			.notNull(),
-	},
-	(t) => [
-		index("idx_messages_conversation_created").on(t.conversationId, t.created),
-	],
-);
