@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PlaygroundRouteImport } from './routes/playground'
 import { Route as DocsRouteImport } from './routes/docs'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
 import { Route as ItemsRouteRouteImport } from './routes/items/route'
@@ -23,6 +24,11 @@ import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundRoute = PlaygroundRouteImport.update({
+  id: '/playground',
+  path: '/playground',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsRoute = DocsRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/items': typeof ItemsRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/docs': typeof DocsRoute
+  '/playground': typeof PlaygroundRoute
   '/privacy': typeof PrivacyRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/items/$itemId': typeof ItemsItemIdRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/settings': typeof SettingsRouteRouteWithChildren
   '/docs': typeof DocsRoute
+  '/playground': typeof PlaygroundRoute
   '/privacy': typeof PrivacyRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/items/$itemId': typeof ItemsItemIdRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/items': typeof ItemsRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/docs': typeof DocsRoute
+  '/playground': typeof PlaygroundRoute
   '/privacy': typeof PrivacyRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/items/$itemId': typeof ItemsItemIdRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/items'
     | '/settings'
     | '/docs'
+    | '/playground'
     | '/privacy'
     | '/auth/sign-in'
     | '/items/$itemId'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/'
     | '/settings'
     | '/docs'
+    | '/playground'
     | '/privacy'
     | '/auth/sign-in'
     | '/items/$itemId'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/items'
     | '/settings'
     | '/docs'
+    | '/playground'
     | '/privacy'
     | '/auth/sign-in'
     | '/items/$itemId'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   ItemsRouteRoute: typeof ItemsRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   DocsRoute: typeof DocsRoute
+  PlaygroundRoute: typeof PlaygroundRoute
   PrivacyRoute: typeof PrivacyRoute
   AuthSignInRoute: typeof AuthSignInRoute
 }
@@ -163,6 +176,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground': {
+      id: '/playground'
+      path: '/playground'
+      fullPath: '/playground'
+      preLoaderRoute: typeof PlaygroundRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs': {
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   ItemsRouteRoute: ItemsRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
   DocsRoute: DocsRoute,
+  PlaygroundRoute: PlaygroundRoute,
   PrivacyRoute: PrivacyRoute,
   AuthSignInRoute: AuthSignInRoute,
 }

@@ -21,9 +21,9 @@ export default function Header() {
 	};
 
 	return (
-		<div className="bg-background">
-			<header className="fixed top-0 z-50 w-full bg-background/80 px-4 backdrop-blur-sm">
-				<nav className="mx-auto flex max-w-5xl items-center justify-between py-4">
+		<div className="border-2 border-green-500 bg-backgroundh px-4">
+			<header className="w-full border-b">
+				<nav className="mx-auto flex max-w-5xl items-center justify-between border-2 border-yellow-500 py-4 sm:text-red-200 md:text-blue-200 lg:text-green-200">
 					<div className="flex items-center gap-2">
 						{showSidebarToggle && (
 							<Button
@@ -39,12 +39,12 @@ export default function Header() {
 							to="/"
 							className="flex items-center gap-2 font-semibold text-lg text-primary"
 						>
-							<span className="text-3xl">☁️</span>
+							<span className="text-3xl" />
 						</Link>
 					</div>
 					<div className="flex items-center gap-2">
 						<UserMenu />
-						<ModeToggle />
+						{/* <ModeToggle /> */}
 					</div>
 				</nav>
 			</header>

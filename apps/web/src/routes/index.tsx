@@ -27,8 +27,8 @@ function GuestRoute() {
 
 function GuestLanding() {
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center px-4">
-			<div className="mx-auto w-full max-w-2xl space-y-8 text-center">
+		<div className="flex min-h-screen flex-col items-center justify-center border-2 border-red-500 px-4">
+			<div className="mx-auto w-full max-w-2xl space-y-8 border-2 border-blue-500 text-center">
 				<h1 className="font-bold text-4xl sm:text-5xl md:text-6xl">
 					Cloudflare Template
 				</h1>

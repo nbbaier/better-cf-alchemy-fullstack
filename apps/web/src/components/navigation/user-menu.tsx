@@ -84,7 +84,7 @@ export default function UserMenu() {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline" size="sm" className="h-9 px-3">
-					<span className="font-semibold text-sm">{firstName}</span>
+					<span className="font-semibold text-sm">User</span>
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56" align="end" forceMount>
