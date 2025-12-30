@@ -26,7 +26,7 @@ export function usePendingConversationMessage({
 		}
 
 		const stored = window.sessionStorage.getItem(
-			`better-chat:pending:${chatId}`,
+			`cf-do:pending:${chatId}`,
 		);
 
 		if (!stored) {
@@ -34,7 +34,7 @@ export function usePendingConversationMessage({
 		}
 
 		setPendingText(stored);
-		window.sessionStorage.removeItem(`better-chat:pending:${chatId}`);
+		window.sessionStorage.removeItem(`cf-do:pending:${chatId}`);
 	}, [chatId]);
 
 	useEffect(() => {
@@ -55,7 +55,7 @@ export function usePendingConversationMessage({
 			if (typeof window !== "undefined") {
 				try {
 					window.sessionStorage.setItem(
-						`better-chat:pending:${chatId}`,
+						`cf-do:pending:${chatId}`,
 						pendingText,
 					);
 				} catch (_storageError) {

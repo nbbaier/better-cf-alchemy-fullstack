@@ -4,11 +4,11 @@ import type { QuickPrompt } from "@/web/types/chat";
  * Application-wide constants
  */
 
-export const SITE_NAME = "better-chat";
-export const SITE_DESCRIPTION = "better chat through durable objects";
-export const PORTFOLIO_SITE = "https://oscargabriel.dev";
-export const SITE_URL = "https://chat.oscargabriel.dev";
-export const SITE_GITHUB = "https://github.com/oscabriel/better-chat";
+export const SITE_NAME = "cf-do-fullstack";
+export const SITE_DESCRIPTION = "Cloudflare Workers + Durable Objects fullstack template";
+export const PORTFOLIO_SITE = "";
+export const SITE_URL = "";
+export const SITE_GITHUB = "";
 
 export const SOCIAL_PROVIDERS = {
 	GOOGLE: "google",

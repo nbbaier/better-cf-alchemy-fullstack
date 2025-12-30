@@ -1,6 +1,6 @@
 export type ChatWidthPreference = "cozy" | "comfortable";
 
-const CHAT_WIDTH_STORAGE_KEY = "better-chat:chat-width";
+const CHAT_WIDTH_STORAGE_KEY = "cf-do:chat-width";
 
 function isChatWidthPreference(
 	value: string | null,

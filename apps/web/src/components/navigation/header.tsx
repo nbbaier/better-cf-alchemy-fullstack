@@ -7,8 +7,8 @@ import { cn } from "@/web/utils/cn";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
 
-const CHAT_SIDEBAR_EVENT = "better-chat:open-history";
-const SETTINGS_SIDEBAR_EVENT = "better-chat:open-settings";
+const CHAT_SIDEBAR_EVENT = "cf-do:open-history";
+const SETTINGS_SIDEBAR_EVENT = "cf-do:open-settings";
 
 export default function Header() {
 	const location = useRouterState({ select: (state) => state.location });

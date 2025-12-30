@@ -59,12 +59,12 @@ function SettingsLayout() {
 	useEffect(() => {
 		const handler = () => setMobileSidebarOpen(true);
 		window.addEventListener(
-			"better-chat:open-settings",
+			"cf-do:open-settings",
 			handler as EventListener,
 		);
 		return () =>
 			window.removeEventListener(
-				"better-chat:open-settings",
+				"cf-do:open-settings",
 				handler as EventListener,
 			);
 	}, []);

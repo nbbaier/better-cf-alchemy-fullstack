@@ -43,7 +43,7 @@ async function deriveUserKey(
 	const derivedKey = await crypto.subtle.deriveKey(
 		{
 			name: "PBKDF2",
-			salt: new TextEncoder().encode(`better-chat-${userId}`),
+			salt: new TextEncoder().encode(`cf-do-fullstack-${userId}`),
 			iterations: 100000,
 			hash: "SHA-256",
 		},

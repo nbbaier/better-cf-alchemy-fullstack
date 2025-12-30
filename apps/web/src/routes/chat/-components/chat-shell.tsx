@@ -33,12 +33,12 @@ export function ChatShell() {
 	useEffect(() => {
 		const handler = () => setMobileSidebarOpen(true);
 		window.addEventListener(
-			"better-chat:open-history",
+			"cf-do:open-history",
 			handler as EventListener,
 		);
 		return () =>
 			window.removeEventListener(
-				"better-chat:open-history",
+				"cf-do:open-history",
 				handler as EventListener,
 			);
 	}, []);
@@ -137,7 +137,7 @@ export function ChatShell() {
 		const newId = generateConversationId();
 		if (typeof window !== "undefined") {
 			try {
-				sessionStorage.setItem(`better-chat:pending:${newId}`, safeText);
+				sessionStorage.setItem(`cf-do:pending:${newId}`, safeText);
 			} catch (_error) {}
 		}
 		void navigate({

@@ -443,7 +443,7 @@ function PrivacyRoute() {
 								<li>
 									→ GitHub:{" "}
 									<a
-										href="https://github.com/better-chat/better-chat/issues"
+										href=""
 										className={subtleLinkClass}
 										target="_blank"
 										rel="noreferrer"

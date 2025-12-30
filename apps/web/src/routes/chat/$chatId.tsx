@@ -31,7 +31,7 @@ export const Route = createFileRoute("/chat/$chatId")({
 		// Check if there's a pending message (new chat flow)
 		const hasPendingMessage =
 			typeof window !== "undefined" &&
-			sessionStorage.getItem(`better-chat:pending:${chatId}`) !== null;
+			sessionStorage.getItem(`cf-do:pending:${chatId}`) !== null;
 
 		// If conversation doesn't exist and no pending message, it's invalid
 		if (!conversationExists && !hasPendingMessage) {

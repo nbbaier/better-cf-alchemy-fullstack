@@ -1,5 +1,5 @@
 {
-	"name": "better-chat",
+	"name": "cf-do-fullstack",
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.8",
 		"alchemy": "^0.81.1",

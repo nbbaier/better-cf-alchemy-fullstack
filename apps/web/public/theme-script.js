@@ -1,6 +1,6 @@
 (() => {
-	const STORAGE_KEY = "better-chat-theme";
-	const SOURCE_KEY = "better-chat-theme-source";
+	const STORAGE_KEY = "cf-do-theme";
+	const SOURCE_KEY = "cf-do-theme-source";
 	const SOURCE_MANUAL = "manual";
 	const SOURCE_SYSTEM = "system";
 	const THEME_LIGHT = "light";
@@ -62,7 +62,7 @@
 
 	const dispatchSync = (theme, source) => {
 		window.dispatchEvent(
-			new CustomEvent("better-chat:theme-sync", {
+			new CustomEvent("cf-do:theme-sync", {
 				detail: { theme, source },
 			}),
 		);
